@@ -1,0 +1,339 @@
+:root {
+    --bg-color: #70c5ce; /* Classic sky blue */
+    --text-color: #ffffff;
+    --border-color: #000000;
+    --panel-bg: #ded895; /* Classic menu bg */
+    --btn-bg: #e47226;
+    --btn-hover: #fa9b50;
+    --btn-text: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Press Start 2P', system-ui, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    -webkit-font-smoothing: none; /* Pixelated look */
+}
+
+/* --- Typography Helpers --- */
+h1, h2, h3, p, label, button, input {
+    text-shadow: 2px 2px 0px #000;
+}
+
+/* --- Layouts --- */
+.menu-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+}
+
+.game-body {
+    overflow: hidden; /* Strict full screen */
+}
+
+/* --- Customization Menu --- */
+.menu-container {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+}
+
+.main-title {
+    font-size: 2.5rem;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.subtitle {
+    color: #fce205;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.customization-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    text-align: left;
+}
+
+.retro-panel {
+    background: var(--panel-bg);
+    border: 4px solid var(--border-color);
+    border-radius: 0;
+    padding: 2rem;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
+}
+
+.control-group {
+    background: #c3b96c;
+    padding: 1.5rem;
+    border: 4px solid var(--border-color);
+    box-shadow: inset -4px -4px 0px rgba(0,0,0,0.2);
+}
+
+.control-group h3 {
+    font-size: 1rem;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.input-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.input-row label {
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+input[type="color"] {
+    -webkit-appearance: none;
+    border: 4px solid var(--border-color);
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    background: none;
+    padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+}
+
+.upload-row {
+    justify-content: stretch;
+}
+
+.upload-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: #ffffff;
+    border: 4px solid var(--border-color);
+    color: #000000;
+    padding: 1rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-shadow: none;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+}
+
+.upload-btn:hover {
+    background: #e0e0e0;
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+}
+
+.upload-btn.alt {
+    background: #a980c2;
+    color: white;
+}
+
+.upload-btn.alt:hover {
+    background: #8e62a8;
+}
+
+.menu-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+/* --- Buttons --- */
+.retro-btn {
+    background: var(--btn-bg);
+    border: 4px solid var(--border-color);
+    color: var(--btn-text);
+    padding: 1rem 2rem;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+}
+
+.retro-btn:hover {
+    background: var(--btn-hover);
+}
+
+.retro-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+}
+
+.retro-btn.secondary {
+    background: #54b256;
+}
+
+.retro-btn.secondary:hover {
+    background: #6cce6d;
+}
+
+.play-btn {
+    font-size: 1.2rem;
+    padding: 1.2rem 3rem;
+    flex-grow: 1;
+    max-width: 500px;
+    background: #54b256;
+}
+
+.play-btn:hover {
+    background: #6cce6d;
+}
+
+/* --- Fullscreen Game --- */
+.fullscreen-game-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    image-rendering: pixelated; /* Ensures pixel art stays sharp */
+}
+
+.ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.score-display {
+    position: absolute;
+    top: 40px;
+    font-size: 3rem;
+    color: white;
+    text-shadow: 4px 4px 0px #000;
+    z-index: 10;
+}
+
+.overlay-screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto;
+    opacity: 0;
+    visibility: hidden;
+    background: rgba(0, 0, 0, 0.5); /* Simple tint */
+}
+
+.overlay-screen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.title-glow {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #fce205;
+}
+
+.title-crash {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #e43b44;
+}
+
+.overlay-screen p {
+    color: white;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+kbd {
+    color: #fce205;
+}
+
+.score-board {
+    background: var(--panel-bg);
+    border: 4px solid var(--border-color);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
+}
+
+.score-board p {
+    margin: 1rem 0;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.score-board span {
+    font-size: 1.5rem;
+    color: #fce205;
+}
+
+.btn-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Responsive Customization Grid */
+@media (max-width: 600px) {
+    .retro-panel {
+        padding: 1.5rem;
+        border-left: none;
+        border-right: none;
+        box-shadow: none;
+    }
+    .customization-grid {
+        grid-template-columns: 1fr;
+    }
+    .main-title {
+        font-size: 1.8rem;
+    }
+    .play-btn {
+        width: 100%;
+    }
+    .btn-group {
+        flex-direction: column;
+        width: 80%;
+    }
+    .retro-btn {
+        width: 100%;
+    }
+}

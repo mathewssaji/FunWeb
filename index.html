@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Bird - Customizer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body class="menu-body">
+    <div class="menu-container retro-panel">
+        <h1 class="main-title">RETRO BIRD</h1>
+        <p class="subtitle">CUSTOMIZATION MENU</p>
+        
+        <div class="customization-grid">
+            <div class="control-group">
+                <h3>PLAYER</h3>
+                <div class="input-row">
+                    <label>COLOR</label>
+                    <input type="color" id="birdColorPicker" value="#fce205">
+                </div>
+                <div class="input-row">
+                    <label>SIZE</label>
+                    <input type="range" id="birdSizeSlider" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 120px;">
+                </div>
+                <div class="input-row upload-row">
+                    <label class="upload-btn">
+                        UPLOAD SPRITE
+                        <input type="file" id="birdImageUpload" accept="image/*" hidden>
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>PIPES</h3>
+                <div class="input-row">
+                    <label>COLOR</label>
+                    <input type="color" id="pipeColorPicker" value="#54b256">
+                </div>
+                <div class="input-row upload-row">
+                    <label class="upload-btn">
+                        UPLOAD TEXTURE
+                        <input type="file" id="pipeImageUpload" accept="image/*" hidden>
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>WORLD</h3>
+                <div class="input-row">
+                    <label>SKY COLOR</label>
+                    <input type="color" id="bgColorPicker" value="#70c5ce">
+                </div>
+                <div class="input-row upload-row">
+                    <label class="upload-btn">
+                        UPLOAD BG
+                        <input type="file" id="bgImageUpload" accept="image/*" hidden>
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>AUDIO</h3>
+                <div class="input-row upload-row">
+                    <label class="upload-btn alt">
+                        FLAP SOUND
+                        <input type="file" id="flapSoundUpload" accept="audio/*" hidden>
+                    </label>
+                </div>
+                <div class="input-row upload-row">
+                    <label class="upload-btn alt">
+                        CRASH SOUND
+                        <input type="file" id="crashSoundUpload" accept="audio/*" hidden>
+                    </label>
+                </div>
+                <small class="storage-warning" id="storageWarning" style="color: #e43b44; display: none; margin-top: 10px;">FILE TOO LARGE!</small>
+            </div>
+
+            <div class="control-group">
+                <h3>CONTROLS</h3>
+                <div class="input-row" style="margin-bottom: 0;">
+                    <label for="voiceControlToggle">VOICE MODE</label>
+                    <input type="checkbox" id="voiceControlToggle" style="width: 32px; height: 32px; accent-color: #54b256;">
+                </div>
+                <p style="font-size: 0.7rem; color: #fff; text-shadow: none; margin-top: 10px;">Play by making sounds! (Needs Mic Access)</p>
+            </div>
+        </div>
+
+        <div class="menu-actions">
+            <button id="resetDefaultsBtn" class="retro-btn secondary">RESET</button>
+            <button id="startGameBtn" class="retro-btn play-btn">PLAY GAME &rarr;</button>
+        </div>
+    </div>
+    <script src="customization.js"></script>
+</body>
+</html>

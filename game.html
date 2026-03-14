@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Bird - Playing</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body class="game-body">
+    <!-- Game Container Full Screen -->
+    <main class="fullscreen-game-wrapper">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- UI Overlays -->
+        <div id="uiLayer" class="ui-layer">
+            <div id="scoreDisplay" class="score-display">0</div>
+            
+            <div id="startScreen" class="overlay-screen active">
+                <h1 class="title-glow">GET READY!</h1>
+                <p>Press <kbd>Space</kbd>, Tap, or Make Noise!</p>
+                <div class="btn-group">
+                    <button id="startBtn" class="retro-btn play-btn">START</button>
+                    <button id="backToMenuBtnStart" class="retro-btn secondary">MENU</button>
+                </div>
+            </div>
+
+            <div id="gameOverScreen" class="overlay-screen hidden">
+                <h1 class="title-crash">GAME OVER</h1>
+                <div class="score-board">
+                    <p>SCORE: <span id="finalScore">0</span></p>
+                    <p>BEST: <span id="bestScore">0</span></p>
+                </div>
+                <div class="btn-group">
+                    <button id="restartBtn" class="retro-btn play-btn">PLAY AGAIN</button>
+                    <button id="backToMenuBtnEnd" class="retro-btn secondary">MENU</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="game.js"></script>
+</body>
+</html>
