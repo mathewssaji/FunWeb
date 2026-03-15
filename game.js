@@ -100,8 +100,8 @@ function checkVoiceInput() {
     }
     let vol = sum / dataArray.length;
 
-    // Threshold can be adjusted; 40 is a reasonable shout/clap detection
-    if (vol > 40) {
+    // Threshold can be adjusted; 25 is easier for voice play without shouting
+    if (vol > 25) {
         const now = Date.now();
         if (now - lastFlapTime > flapCooldown) {
             bird.flap(getRelativeSizes());
@@ -119,12 +119,14 @@ function playSound(audioEl) {
 
 // Relative sizes based on canvas height for responsiveness
 const getRelativeSizes = () => {
+    // Make the game a bit easier if using voice controls
+    const isVoice = voiceMode;
     return {
-        gravity: canvas.height * 0.00035, // Adjust gravity based on screen height
-        jump: canvas.height * -0.008, 
+        gravity: canvas.height * (isVoice ? 0.00025 : 0.00035), // Reduce gravity for voice
+        jump: canvas.height * (isVoice ? -0.007 : -0.008), // Softer jump for voice
         pipeWidth: Math.max(50, canvas.width * 0.1),
-        pipeGap: Math.max(140, canvas.height * 0.22),
-        pipeSpeed: canvas.width * 0.005,
+        pipeGap: Math.max(isVoice ? 180 : 140, canvas.height * (isVoice ? 0.3 : 0.22)), // Wider gap for voice
+        pipeSpeed: canvas.width * (isVoice ? 0.0035 : 0.005), // Slower pipes for voice
         birdRadius: Math.max(12, canvas.height * 0.015) * birdSizeMultiplier
     };
 };
