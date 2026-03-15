@@ -110,17 +110,16 @@ function playSound(audioEl) {
 
 const getRelativeSizes = () => {
     const isVoice = voiceMode;
-    // Base scale strictly on height to maintain consistent physical proportions across devices
-    // instead of tying movement logic to width which varies wildly between desktop and mobile.
-    const baseScale = canvas.height;
+    const cw = canvas.width;
+    const ch = canvas.height;
     
     return {
-        gravity: baseScale * (isVoice ? 0.00025 : 0.0003),
-        jump: baseScale * (isVoice ? -0.007 : -0.0075),
-        pipeWidth: Math.max(50, baseScale * 0.12), // 12% of screen height
-        pipeGap: Math.max(isVoice ? 250 : 140, baseScale * (isVoice ? 0.45 : 0.22)),
-        pipeSpeed: baseScale * (isVoice ? 0.004 : 0.0045), // consistent speed across screens
-        birdRadius: Math.max(12, baseScale * 0.015) * birdSizeMultiplier
+        gravity: ch * (isVoice ? 0.00025 : 0.0003),
+        jump: ch * (isVoice ? -0.007 : -0.0075),
+        pipeWidth: Math.max(50, cw * 0.12), // 12% of screen width
+        pipeGap: Math.max(isVoice ? 250 : 150, ch * (isVoice ? 0.45 : 0.25)),
+        pipeSpeed: cw * (isVoice ? 0.003 : 0.004), // scaled by width for consistent horizontal crossing
+        birdRadius: Math.max(12, ch * 0.015) * birdSizeMultiplier
     };
 };
 
@@ -195,11 +194,10 @@ const pipes = {
     },
 
     update: function(s) {
-        // Frequency of pipes based purely on the consistent size scale
-        let freq = Math.floor(canvas.height / s.pipeSpeed * 0.5); 
-        if (freq < 45) freq = 45;
+        // Fix spawn frequency independently (in logical physical frames)
+        let freq = voiceMode ? 140 : 110;
 
-        if (frames % freq === 0) {
+        if (frames % freq === 0 && frames > 0) {
             let minPipeHeight = canvas.height * 0.1; 
             let maxTopHeight = canvas.height - s.pipeGap - minPipeHeight;
             let topHeight = Math.max(minPipeHeight, Math.random() * maxTopHeight);
@@ -259,7 +257,8 @@ function drawBackground() {
 }
 
 let lastTime = 0;
-const frameInterval = 1000 / 60; // Hard cap at 60 FPS
+let accumulator = 0;
+const timeStep = 1000 / 60; // 60 physics updates per physical second
 
 function loop(timestamp) {
     if (gameState !== 'PLAYING') return;
@@ -268,24 +267,27 @@ function loop(timestamp) {
 
     if (!timestamp) timestamp = performance.now();
     let deltaTime = timestamp - lastTime;
+    if (deltaTime > 250) deltaTime = 250; // Cap to prevent death spiral if tab inactive
+    lastTime = timestamp;
 
-    // Throttle rendering and logic to exactly 60 updates per second
-    if (deltaTime >= frameInterval) {
-        lastTime = timestamp - (deltaTime % frameInterval);
+    accumulator += deltaTime;
 
-        const sizes = getRelativeSizes();
+    const sizes = getRelativeSizes();
 
-        drawBackground();
-        pipes.draw(sizes);
-        bird.draw(sizes);
-
+    // Fixed timestep guarantees logic executes consistently regardless of fps lag
+    while (accumulator >= timeStep) {
         bird.update(sizes);
         pipes.update(sizes);
-        
-        checkVoiceInput();
-
         frames++;
+        accumulator -= timeStep;
     }
+
+    // Always draw once per screen refresh
+    drawBackground();
+    pipes.draw(sizes);
+    bird.draw(sizes);
+    
+    checkVoiceInput();
 }
 
 function resetGame() {
@@ -293,6 +295,7 @@ function resetGame() {
     pipes.reset();
     score = 0;
     frames = 0;
+    accumulator = 0;
     lastTime = performance.now(); // Reset loop timing
     scoreDisplay.innerText = score;
     scoreDisplay.classList.remove('hidden');
