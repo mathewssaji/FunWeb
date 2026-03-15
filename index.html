@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,12 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
+
 <body class="menu-body">
     <div class="menu-container retro-panel">
         <h1 class="main-title">Maathante Parakumthalika🛸</h1>
         <p class="subtitle">CUSTOMIZATION MENU</p>
-        
+
         <div class="customization-grid">
             <div class="control-group">
                 <h3>PLAYER</h3>
@@ -21,7 +23,8 @@
                 </div>
                 <div class="input-row">
                     <label>SIZE</label>
-                    <input type="range" id="birdSizeSlider" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 120px;">
+                    <input type="range" id="birdSizeSlider" min="0.5" max="2.0" step="0.1" value="1.0"
+                        style="width: 120px;">
                 </div>
                 <div class="input-row upload-row">
                     <label class="upload-btn">
@@ -73,16 +76,19 @@
                         <input type="file" id="crashSoundUpload" accept="audio/*" hidden>
                     </label>
                 </div>
-                <small class="storage-warning" id="storageWarning" style="color: #e43b44; display: none; margin-top: 10px;">FILE TOO LARGE!</small>
+                <small class="storage-warning" id="storageWarning"
+                    style="color: #e43b44; display: none; margin-top: 10px;">FILE TOO LARGE!</small>
             </div>
 
             <div class="control-group">
                 <h3>CONTROLS</h3>
                 <div class="input-row" style="margin-bottom: 0;">
                     <label for="voiceControlToggle">VOICE MODE</label>
-                    <input type="checkbox" id="voiceControlToggle" style="width: 32px; height: 32px; accent-color: #54b256;">
+                    <input type="checkbox" id="voiceControlToggle"
+                        style="width: 32px; height: 32px; accent-color: #54b256;">
                 </div>
-                <p style="font-size: 0.7rem; color: #fff; text-shadow: none; margin-top: 10px;">Play by making sounds! (Needs Mic Access)</p>
+                <p style="font-size: 0.7rem; color: #fff; text-shadow: none; margin-top: 10px;">Play by making sounds!
+                    (Needs Mic Access)</p>
             </div>
         </div>
 
@@ -93,4 +99,5 @@
     </div>
     <script src="customization.js"></script>
 </body>
+
 </html>
