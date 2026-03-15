@@ -110,13 +110,17 @@ function playSound(audioEl) {
 
 const getRelativeSizes = () => {
     const isVoice = voiceMode;
+    // Base scale strictly on height to maintain consistent physical proportions across devices
+    // instead of tying movement logic to width which varies wildly between desktop and mobile.
+    const baseScale = canvas.height;
+    
     return {
-        gravity: canvas.height * (isVoice ? 0.00025 : 0.0003),
-        jump: canvas.height * (isVoice ? -0.007 : -0.0075),
-        pipeWidth: Math.max(50, canvas.width * 0.1),
-        pipeGap: Math.max(isVoice ? 190 : 140, canvas.height * (isVoice ? 0.3 : 0.22)),
-        pipeSpeed: canvas.width * (isVoice ? 0.0035 : 0.0048),
-        birdRadius: Math.max(12, canvas.height * 0.015) * birdSizeMultiplier
+        gravity: baseScale * (isVoice ? 0.00025 : 0.0003),
+        jump: baseScale * (isVoice ? -0.007 : -0.0075),
+        pipeWidth: Math.max(50, baseScale * 0.12), // 12% of screen height
+        pipeGap: Math.max(isVoice ? 250 : 140, baseScale * (isVoice ? 0.45 : 0.22)),
+        pipeSpeed: baseScale * (isVoice ? 0.004 : 0.0045), // consistent speed across screens
+        birdRadius: Math.max(12, baseScale * 0.015) * birdSizeMultiplier
     };
 };
 
@@ -191,8 +195,9 @@ const pipes = {
     },
 
     update: function(s) {
-        let freq = Math.floor(canvas.width / s.pipeSpeed / 2.5);
-        if (freq < 40) freq = 40;
+        // Frequency of pipes based purely on the consistent size scale
+        let freq = Math.floor(canvas.height / s.pipeSpeed * 0.5); 
+        if (freq < 45) freq = 45;
 
         if (frames % freq === 0) {
             let minPipeHeight = canvas.height * 0.1; 
@@ -253,22 +258,34 @@ function drawBackground() {
     }
 }
 
-function loop() {
+let lastTime = 0;
+const frameInterval = 1000 / 60; // Hard cap at 60 FPS
+
+function loop(timestamp) {
     if (gameState !== 'PLAYING') return;
     
-    const sizes = getRelativeSizes();
-
-    drawBackground();
-    pipes.draw(sizes);
-    bird.draw(sizes);
-
-    bird.update(sizes);
-    pipes.update(sizes);
-    
-    checkVoiceInput();
-
-    frames++;
     reqAnimFrame = requestAnimationFrame(loop);
+
+    if (!timestamp) timestamp = performance.now();
+    let deltaTime = timestamp - lastTime;
+
+    // Throttle rendering and logic to exactly 60 updates per second
+    if (deltaTime >= frameInterval) {
+        lastTime = timestamp - (deltaTime % frameInterval);
+
+        const sizes = getRelativeSizes();
+
+        drawBackground();
+        pipes.draw(sizes);
+        bird.draw(sizes);
+
+        bird.update(sizes);
+        pipes.update(sizes);
+        
+        checkVoiceInput();
+
+        frames++;
+    }
 }
 
 function resetGame() {
@@ -276,6 +293,7 @@ function resetGame() {
     pipes.reset();
     score = 0;
     frames = 0;
+    lastTime = performance.now(); // Reset loop timing
     scoreDisplay.innerText = score;
     scoreDisplay.classList.remove('hidden');
     
