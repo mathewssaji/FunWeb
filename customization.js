@@ -12,26 +12,23 @@ const flapSoundUpload = document.getElementById('flapSoundUpload');
 const crashSoundUpload = document.getElementById('crashSoundUpload');
 const storageWarning = document.getElementById('storageWarning');
 
-// Load values
-birdColorPicker.value = localStorage.getItem('birdColor') || '#fce205'; // Retro yellow
+birdColorPicker.value = localStorage.getItem('birdColor') || '#fce205';
 birdSizeSlider.value = localStorage.getItem('birdSize') || '1.0';
-pipeColorPicker.value = localStorage.getItem('pipeColor') || '#54b256'; // Retro green
-bgColorPicker.value = localStorage.getItem('bgColor') || '#70c5ce'; // Retro sky blue
+pipeColorPicker.value = localStorage.getItem('pipeColor') || '#54b256';
+bgColorPicker.value = localStorage.getItem('bgColor') || '#70c5ce';
 voiceControlToggle.checked = localStorage.getItem('voiceMode') === 'true';
 
-// Bind Inputs
 birdColorPicker.addEventListener('input', (e) => localStorage.setItem('birdColor', e.target.value));
 birdSizeSlider.addEventListener('input', (e) => localStorage.setItem('birdSize', e.target.value));
 pipeColorPicker.addEventListener('input', (e) => localStorage.setItem('pipeColor', e.target.value));
 bgColorPicker.addEventListener('input', (e) => localStorage.setItem('bgColor', e.target.value));
 voiceControlToggle.addEventListener('change', (e) => localStorage.setItem('voiceMode', e.target.checked));
 
-// Upload Handlers
 function handleUpload(inputEl, key) {
     inputEl.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 2.5 * 1024 * 1024) { // ~2.5MB
+            if (file.size > 2.5 * 1024 * 1024) {
                 storageWarning.innerText = "File too large! Must be under 2.5MB.";
                 storageWarning.style.display = 'block';
                 return;
@@ -60,7 +57,6 @@ handleUpload(bgImageUpload, 'bgImage');
 handleUpload(flapSoundUpload, 'flapSound');
 handleUpload(crashSoundUpload, 'crashSound');
 
-// Actions
 document.getElementById('startGameBtn').addEventListener('click', () => {
     window.location.href = './game.html';
 });
