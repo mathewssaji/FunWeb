@@ -94,7 +94,7 @@ function checkVoiceInput() {
 
     const dataArray = new Uint8Array(analyser.frequencyBinCount);
     analyser.getByteFrequencyData(dataArray);
-    
+
     let sum = 0;
     for (let i = 0; i < dataArray.length; i++) {
         sum += dataArray[i];
@@ -121,26 +121,26 @@ const getRelativeSizes = () => {
     const isVoice = voiceMode;
     const cw = canvas.width;
     const ch = canvas.height;
-    
+
     // Calculate a difficulty multiplier based on the current score
     // Caps at a max 1.6x multiplier around 50 points to prevent impossible speeds
     let diffScale = 1 + (score * 0.012);
-    
+
     // Add a sudden baseline speed increase at score 5
     if (score >= 5) {
         diffScale += 0.15; // Suddenly speeds up and gap closes slightly
     }
-    
+
     diffScale = Math.min(1.6, diffScale); // Max cap
 
     return {
         gravity: ch * (isVoice ? 0.00025 : 0.0003),
         jump: ch * (isVoice ? -0.007 : -0.0075),
-        pipeWidth: Math.max(50, cw * 0.12), 
+        pipeWidth: Math.max(50, cw * 0.12),
         // Gap gets smaller as score increases
         pipeGap: Math.max(isVoice ? 220 : 130, ch * (isVoice ? 0.45 : 0.28) / diffScale),
         // Speed gets faster as score increases
-        pipeSpeed: cw * (isVoice ? 0.003 : 0.004) * diffScale, 
+        pipeSpeed: cw * (isVoice ? 0.003 : 0.004) * diffScale,
         birdRadius: Math.max(12, ch * 0.015) * birdSizeMultiplier
     };
 };
@@ -150,23 +150,23 @@ const bird = {
     y: canvas.height / 2,
     velocity: 0,
 
-    draw: function(s) {
+    draw: function (s) {
         if (birdImage && birdImage.complete) {
-            const size = s.birdRadius * 2.5; 
-            ctx.drawImage(birdImage, this.x - size/2, this.y - size/2, size, size);
+            const size = s.birdRadius * 2.5;
+            ctx.drawImage(birdImage, this.x - size / 2, this.y - size / 2, size, size);
         } else {
             ctx.beginPath();
             ctx.arc(this.x, this.y, s.birdRadius, 0, Math.PI * 2);
             ctx.fillStyle = birdColor;
             ctx.fill();
-            
+
             ctx.lineWidth = 4;
             ctx.strokeStyle = '#000';
             ctx.stroke();
         }
     },
 
-    update: function(s) {
+    update: function (s) {
         this.velocity += s.gravity;
         this.y += this.velocity;
 
@@ -174,19 +174,19 @@ const bird = {
             this.y = canvas.height - s.birdRadius;
             gameOver(s);
         }
-        
+
         if (this.y - s.birdRadius <= 0) {
             this.y = s.birdRadius;
             this.velocity = 0;
         }
     },
 
-    flap: function(s) {
+    flap: function (s) {
         this.velocity = s.jump;
         playSound(flapSound);
     },
 
-    reset: function() {
+    reset: function () {
         this.y = canvas.height / 2;
         this.velocity = 0;
     }
@@ -195,10 +195,10 @@ const bird = {
 const pipes = {
     items: [],
 
-    draw: function(s) {
+    draw: function (s) {
         for (let i = 0; i < this.items.length; i++) {
             let p = this.items[i];
-            
+
             if (pipeImage && pipeImage.complete) {
                 ctx.drawImage(pipeImage, p.x, 0, s.pipeWidth, p.top);
                 ctx.drawImage(pipeImage, p.x, canvas.height - p.bottom, s.pipeWidth, p.bottom);
@@ -206,7 +206,7 @@ const pipes = {
                 ctx.fillStyle = pipeColor;
                 ctx.lineWidth = 4;
                 ctx.strokeStyle = '#000';
-                
+
                 ctx.fillRect(p.x, 0, s.pipeWidth, p.top);
                 ctx.strokeRect(p.x, 0, s.pipeWidth, p.top);
                 ctx.fillRect(p.x, canvas.height - p.bottom, s.pipeWidth, p.bottom);
@@ -215,21 +215,21 @@ const pipes = {
         }
     },
 
-    update: function(s) {
+    update: function (s) {
         // Frequency of spawned pipes scales with the pipe speed, ensuring pipes aren't drawn on top of each other
         // Calculate dynamic frequency so the gap between pipes decreases slightly but safely as it gets harder
         let baseFreq = voiceMode ? 140 : 110;
         let diffScale = 1 + (score * 0.012);
         if (score >= 5) diffScale += 0.15;
         diffScale = Math.min(1.6, diffScale);
-        
-        let freq = Math.floor(baseFreq / diffScale); 
+
+        let freq = Math.floor(baseFreq / diffScale);
 
         if (frames % freq === 0 && frames > 0) {
-            let minPipeHeight = canvas.height * 0.1; 
+            let minPipeHeight = canvas.height * 0.1;
             let maxTopHeight = canvas.height - s.pipeGap - minPipeHeight;
             let topHeight = Math.max(minPipeHeight, Math.random() * maxTopHeight);
-            
+
             this.items.push({
                 x: canvas.width,
                 top: topHeight,
@@ -240,7 +240,7 @@ const pipes = {
 
         for (let i = 0; i < this.items.length; i++) {
             let p = this.items[i];
-            
+
             p.x -= s.pipeSpeed;
 
             let bxLeft = bird.x - s.birdRadius;
@@ -270,7 +270,7 @@ const pipes = {
         }
     },
 
-    reset: function() {
+    reset: function () {
         this.items = [];
     }
 };
@@ -287,54 +287,52 @@ function drawBackground() {
 function drawMicFeedback() {
     if (!voiceMode || gameState !== 'PLAYING') return;
 
-    // Draw the "MAKE NOISE!" warning text center top if score >= 5
-    if (score >= 5) {
-        ctx.fillStyle = '#fce205'; // Retro yellow warning
-        // Scale font slightly based on screen
-        const fontSize = Math.max(16, canvas.width * 0.03); 
-        ctx.font = `${fontSize}px "Press Start 2P"`;
-        ctx.textAlign = 'center';
-        
-        // Add shadow for readability
-        ctx.shadowColor = 'black';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 4;
-        ctx.shadowOffsetY = 4;
-        
-        // Pulsing effect based on frame count
-        if (frames % 40 < 20) {
-            ctx.fillText('MAKE NOISE!', canvas.width / 2, canvas.height * 0.15);
-        }
-        
-        ctx.shadowColor = 'transparent'; // Reset shadow
+    // Draw the "MAKE NOISE!" warning text center top
+    ctx.fillStyle = '#fce205'; // Retro yellow warning
+    // Scale font slightly based on screen
+    const fontSize = Math.max(15, canvas.width * 0.008);
+    ctx.font = `${fontSize}px "Press Start 2P"`;
+    ctx.textAlign = 'center';
+
+    // Add shadow for readability
+    ctx.shadowColor = 'black';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 4;
+
+    // Pulsing effect based on frame count
+    if (frames % 40 < 20) {
+        ctx.fillText('MAKE NOISE!', canvas.width / 2, canvas.height * 0.15);
     }
+
+    ctx.shadowColor = 'transparent'; // Reset shadow
 
     const barWidth = 30;
     const maxBarHeight = 150;
     const margin = 20;
-    
+
     // Draw background container
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fillRect(margin, canvas.height - margin - maxBarHeight, barWidth, maxBarHeight);
-    
+
     // Map volume to height (assuming 0-100 is normal range, cap at 100)
     let fillHeight = (Math.min(currentVolume, 100) / 100) * maxBarHeight;
-    
+
     // Color logic: Red if below threshold, Green if above threshold
     if (currentVolume > 25) {
         ctx.fillStyle = '#54b256'; // Green
     } else {
         ctx.fillStyle = '#e43b44'; // Red
     }
-    
+
     // Draw volume fill
     ctx.fillRect(margin, canvas.height - margin - fillHeight, barWidth, fillHeight);
-    
+
     // Draw threshold line
     const thresholdY = canvas.height - margin - (25 / 100) * maxBarHeight;
     ctx.fillStyle = 'white';
     ctx.fillRect(margin - 5, thresholdY, barWidth + 10, 4);
-    
+
     // Text label
     ctx.fillStyle = 'white';
     ctx.font = '12px "Press Start 2P"';
@@ -348,7 +346,7 @@ const timeStep = 1000 / 60; // 60 physics updates per physical second
 
 function loop(timestamp) {
     if (gameState !== 'PLAYING') return;
-    
+
     reqAnimFrame = requestAnimationFrame(loop);
 
     if (!timestamp) timestamp = performance.now();
@@ -373,7 +371,7 @@ function loop(timestamp) {
     pipes.draw(sizes);
     bird.draw(sizes);
     drawMicFeedback();
-    
+
     checkVoiceInput();
 }
 
@@ -386,7 +384,7 @@ function resetGame() {
     lastTime = performance.now(); // Reset loop timing
     scoreDisplay.innerText = score;
     scoreDisplay.classList.remove('hidden');
-    
+
     startScreen.classList.remove('active');
     startScreen.classList.add('hidden');
     gameOverScreen.classList.remove('active');
@@ -394,7 +392,7 @@ function resetGame() {
     uiLayer.style.pointerEvents = 'none';
 
     gameState = 'PLAYING';
-    
+
     if (voiceMode && !audioContext) {
         initMicrophone().then(loop);
     } else {
@@ -420,7 +418,7 @@ function gameOver(sizes) {
     gameOverScreen.classList.remove('hidden');
     setTimeout(() => {
         gameOverScreen.classList.add('active');
-        uiLayer.style.pointerEvents = 'auto'; 
+        uiLayer.style.pointerEvents = 'auto';
     }, 50);
 }
 
@@ -448,10 +446,10 @@ window.addEventListener('keydown', inputHandler);
 canvas.addEventListener('mousedown', inputHandler);
 canvas.addEventListener('touchstart', (e) => {
     if (e.target.tagName !== 'BUTTON') {
-        e.preventDefault(); 
+        e.preventDefault();
         inputHandler(e);
     }
-}, {passive: false});
+}, { passive: false });
 
 startBtn.addEventListener('click', () => {
     resetGame();
@@ -463,6 +461,6 @@ restartBtn.addEventListener('click', () => {
     bird.flap(getRelativeSizes());
 });
 
-if(birdImage) birdImage.onload = drawInitialState;
-if(bgImage) bgImage.onload = drawInitialState;
+if (birdImage) birdImage.onload = drawInitialState;
+if (bgImage) bgImage.onload = drawInitialState;
 drawInitialState();
