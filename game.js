@@ -125,7 +125,7 @@ const getRelativeSizes = () => {
         gravity: canvas.height * (isVoice ? 0.00025 : 0.00035), // Reduce gravity for voice
         jump: canvas.height * (isVoice ? -0.007 : -0.008), // Softer jump for voice
         pipeWidth: Math.max(50, canvas.width * 0.1),
-        pipeGap: Math.max(isVoice ? 180 : 140, canvas.height * (isVoice ? 0.3 : 0.22)), // Wider gap for voice
+        pipeGap: Math.max(isVoice ? 250 : 140, canvas.height * (isVoice ? 0.45 : 0.22)), // Even wider gap for voice
         pipeSpeed: canvas.width * (isVoice ? 0.0035 : 0.005), // Slower pipes for voice
         birdRadius: Math.max(12, canvas.height * 0.015) * birdSizeMultiplier
     };
