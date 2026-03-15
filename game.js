@@ -111,11 +111,11 @@ function playSound(audioEl) {
 const getRelativeSizes = () => {
     const isVoice = voiceMode;
     return {
-        gravity: canvas.height * (isVoice ? 0.00025 : 0.00025),
-        jump: canvas.height * (isVoice ? -0.007 : -0.008),
+        gravity: canvas.height * (isVoice ? 0.00025 : 0.0003),
+        jump: canvas.height * (isVoice ? -0.007 : -0.0075),
         pipeWidth: Math.max(50, canvas.width * 0.1),
         pipeGap: Math.max(isVoice ? 250 : 140, canvas.height * (isVoice ? 0.45 : 0.22)),
-        pipeSpeed: canvas.width * (isVoice ? 0.0035 : 0.0003),
+        pipeSpeed: canvas.width * (isVoice ? 0.0035 : 0.0038),
         birdRadius: Math.max(12, canvas.height * 0.015) * birdSizeMultiplier
     };
 };
