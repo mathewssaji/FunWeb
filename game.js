@@ -111,7 +111,7 @@ function playSound(audioEl) {
 const getRelativeSizes = () => {
     const isVoice = voiceMode;
     return {
-        gravity: canvas.height * (isVoice ? 0.00025 : 0.00035),
+        gravity: canvas.height * (isVoice ? 0.00025 : 0.00025),
         jump: canvas.height * (isVoice ? -0.007 : -0.008),
         pipeWidth: Math.max(50, canvas.width * 0.1),
         pipeGap: Math.max(isVoice ? 250 : 140, canvas.height * (isVoice ? 0.45 : 0.22)),
