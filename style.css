@@ -105,6 +105,7 @@ h1, h2, h3, p, label, button, input {
 
 input[type="color"] {
     -webkit-appearance: none;
+    appearance: none;
     border: 4px solid var(--border-color);
     width: 48px;
     height: 48px;
@@ -211,12 +212,14 @@ input[type="color"]::-webkit-color-swatch {
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
 }
 
 canvas {
     display: block;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     image-rendering: pixelated; /* Ensures pixel art stays sharp */
 }
 
@@ -226,6 +229,7 @@ canvas {
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     pointer-events: none;
     display: flex;
     flex-direction: column;
@@ -335,5 +339,30 @@ kbd {
     }
     .retro-btn {
         width: 100%;
+    }
+    .title-glow, .title-crash {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+    .score-display {
+        font-size: 2.5rem;
+        top: 20px;
+    }
+    .overlay-screen p {
+        font-size: 0.8rem;
+        text-align: center;
+        padding: 0 1rem;
+    }
+    .score-board {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        width: 90%;
+        max-width: 320px;
+    }
+    .score-board p {
+        font-size: 1rem;
+    }
+    .score-board span {
+        font-size: 1.2rem;
     }
 }
