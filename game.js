@@ -27,6 +27,14 @@ bestScoreEl.innerText = bestScore;
 let gameState = 'START';
 let reqAnimFrame;
 
+// Update instructional text upon load based on mode
+const instructionText = startScreen.querySelector('p');
+if (localStorage.getItem('voiceMode') === 'true') {
+    instructionText.innerHTML = "Make Noise to Play!";
+} else {
+    instructionText.innerHTML = "Press <kbd>Space</kbd> or Tap!";
+}
+
 let birdImage = null;
 let pipeImage = null;
 let bgImage = null;
@@ -62,6 +70,7 @@ let analyser;
 let microphone;
 let lastFlapTime = 0;
 const flapCooldown = 300;
+let currentVolume = 0; // Expose volume for drawing
 
 async function initMicrophone() {
     if (!voiceMode) return;
@@ -90,9 +99,9 @@ function checkVoiceInput() {
     for (let i = 0; i < dataArray.length; i++) {
         sum += dataArray[i];
     }
-    let vol = sum / dataArray.length;
+    currentVolume = sum / dataArray.length;
 
-    if (vol > 25) {
+    if (currentVolume > 25) {
         const now = Date.now();
         if (now - lastFlapTime > flapCooldown) {
             bird.flap(getRelativeSizes());
@@ -113,12 +122,25 @@ const getRelativeSizes = () => {
     const cw = canvas.width;
     const ch = canvas.height;
     
+    // Calculate a difficulty multiplier based on the current score
+    // Caps at a max 1.6x multiplier around 50 points to prevent impossible speeds
+    let diffScale = 1 + (score * 0.012);
+    
+    // Add a sudden baseline speed increase at score 5
+    if (score >= 5) {
+        diffScale += 0.15; // Suddenly speeds up and gap closes slightly
+    }
+    
+    diffScale = Math.min(1.6, diffScale); // Max cap
+
     return {
         gravity: ch * (isVoice ? 0.00025 : 0.0003),
         jump: ch * (isVoice ? -0.007 : -0.0075),
-        pipeWidth: Math.max(50, cw * 0.12), // 12% of screen width
-        pipeGap: Math.max(isVoice ? 250 : 150, ch * (isVoice ? 0.45 : 0.25)),
-        pipeSpeed: cw * (isVoice ? 0.003 : 0.004), // scaled by width for consistent horizontal crossing
+        pipeWidth: Math.max(50, cw * 0.12), 
+        // Gap gets smaller as score increases
+        pipeGap: Math.max(isVoice ? 220 : 130, ch * (isVoice ? 0.45 : 0.28) / diffScale),
+        // Speed gets faster as score increases
+        pipeSpeed: cw * (isVoice ? 0.003 : 0.004) * diffScale, 
         birdRadius: Math.max(12, ch * 0.015) * birdSizeMultiplier
     };
 };
@@ -194,8 +216,14 @@ const pipes = {
     },
 
     update: function(s) {
-        // Fix spawn frequency independently (in logical physical frames)
-        let freq = voiceMode ? 140 : 110;
+        // Frequency of spawned pipes scales with the pipe speed, ensuring pipes aren't drawn on top of each other
+        // Calculate dynamic frequency so the gap between pipes decreases slightly but safely as it gets harder
+        let baseFreq = voiceMode ? 140 : 110;
+        let diffScale = 1 + (score * 0.012);
+        if (score >= 5) diffScale += 0.15;
+        diffScale = Math.min(1.6, diffScale);
+        
+        let freq = Math.floor(baseFreq / diffScale); 
 
         if (frames % freq === 0 && frames > 0) {
             let minPipeHeight = canvas.height * 0.1; 
@@ -256,6 +284,64 @@ function drawBackground() {
     }
 }
 
+function drawMicFeedback() {
+    if (!voiceMode || gameState !== 'PLAYING') return;
+
+    // Draw the "MAKE NOISE!" warning text center top if score >= 5
+    if (score >= 5) {
+        ctx.fillStyle = '#fce205'; // Retro yellow warning
+        // Scale font slightly based on screen
+        const fontSize = Math.max(16, canvas.width * 0.03); 
+        ctx.font = `${fontSize}px "Press Start 2P"`;
+        ctx.textAlign = 'center';
+        
+        // Add shadow for readability
+        ctx.shadowColor = 'black';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 4;
+        ctx.shadowOffsetY = 4;
+        
+        // Pulsing effect based on frame count
+        if (frames % 40 < 20) {
+            ctx.fillText('MAKE NOISE!', canvas.width / 2, canvas.height * 0.15);
+        }
+        
+        ctx.shadowColor = 'transparent'; // Reset shadow
+    }
+
+    const barWidth = 30;
+    const maxBarHeight = 150;
+    const margin = 20;
+    
+    // Draw background container
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(margin, canvas.height - margin - maxBarHeight, barWidth, maxBarHeight);
+    
+    // Map volume to height (assuming 0-100 is normal range, cap at 100)
+    let fillHeight = (Math.min(currentVolume, 100) / 100) * maxBarHeight;
+    
+    // Color logic: Red if below threshold, Green if above threshold
+    if (currentVolume > 25) {
+        ctx.fillStyle = '#54b256'; // Green
+    } else {
+        ctx.fillStyle = '#e43b44'; // Red
+    }
+    
+    // Draw volume fill
+    ctx.fillRect(margin, canvas.height - margin - fillHeight, barWidth, fillHeight);
+    
+    // Draw threshold line
+    const thresholdY = canvas.height - margin - (25 / 100) * maxBarHeight;
+    ctx.fillStyle = 'white';
+    ctx.fillRect(margin - 5, thresholdY, barWidth + 10, 4);
+    
+    // Text label
+    ctx.fillStyle = 'white';
+    ctx.font = '12px "Press Start 2P"';
+    ctx.textAlign = 'left';
+    ctx.fillText('MIC', margin - 5, canvas.height - margin - maxBarHeight - 10);
+}
+
 let lastTime = 0;
 let accumulator = 0;
 const timeStep = 1000 / 60; // 60 physics updates per physical second
@@ -286,6 +372,7 @@ function loop(timestamp) {
     drawBackground();
     pipes.draw(sizes);
     bird.draw(sizes);
+    drawMicFeedback();
     
     checkVoiceInput();
 }
@@ -345,6 +432,7 @@ function drawInitialState() {
 }
 
 function inputHandler(e) {
+    if (voiceMode) return; // Disable tapping and spacebar when using voice controls
     if (e.type === 'keydown' && e.code !== 'Space') return;
     if (e.target.closest('.btn-group') || e.target.tagName === 'BUTTON') return;
 
